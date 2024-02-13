@@ -14,7 +14,7 @@ And adds these as tags against the image, for example: `sd:checkpoint:revAnimate
 ## Install
 
 ```shell
-git clone https://github.com/staff0rd/sd-hydrus-tagger
+git clone https://github.com/VoidXedis/sd-hydrus-tagger
 cd sd-hydrus-tagger
 python -m venv venv
 source venv/bin/activate
@@ -42,3 +42,6 @@ python main.py process -k <access key from above> process-images
 python main.py --help
 python main.py process-images --help
 ```
+
+
+All credit granted to https://github.com/staff0rd i just made minor tweaks to make it work with SDNext metadata 
