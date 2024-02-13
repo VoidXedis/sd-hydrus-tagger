@@ -1,5 +1,5 @@
 import json
-
+import re
 
 def find_json_value(json_input, lookup_key):
     if isinstance(json_input, dict):
@@ -12,29 +12,30 @@ def find_json_value(json_input, lookup_key):
         for item in json_input:
             yield from find_json_value(item, lookup_key)
 
+def find_text_value(text_input, lookup_key):
+    if isinstance(text_input, dict):
+        for k, v in text_input.items():
+            if k == lookup_key:
+                yield v
+            else:
+                yield from find_text_value(v, lookup_key)
+    elif isinstance(text_input, list):
+        for item in text_input:
+            yield from find_text_value(item, lookup_key)
 
-def get_comfyui_tags(image):
+def get_sdnext_tags(image):
     tags = []
     items = image.info or {}
-    if "prompt" in items:
-        comfyui_prompt = json.loads(items["prompt"])
+    if "parameters" in items:
+        parameter_text = items["parameters"]
 
-        keys = [
-            ("ckpt_name", "checkpoint"),
-            ("vae_name", "vae"),
-            ("lora_name", "lora"),
-            ("sampler_name", "sampler"),
-            ("text", "prompt"),
-        ]
+        # Extract information using regular expressions
+        parameter_pattern = re.compile(r'(\w+): (.+?)(?:,|$)')
+        parameters = re.findall(parameter_pattern, parameter_text)
 
-        for key in keys:
-            for value in find_json_value(comfyui_prompt, key[0]):
-                if len(key) > 1:
-                    name = key[1]
-                else:
-                    name = key[0]
+        # Add extracted key-value pairs as tags
+        for key, value in parameters:
+            tags.append(f"{key}:{value.strip()}")
 
-                tags.append(f"sd:{name}:{value}")
-
-        tags = set(tags)
     return tags
+
